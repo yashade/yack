@@ -32,6 +32,7 @@ func main() {
 		fmt.Fprintf(w, "hello gratuscms")
 	})
 
+	// get all posts
 	router.GET("/posts", func (w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 		var posts []Post
 		db.Find(&posts)
@@ -43,6 +44,22 @@ func main() {
 
 		w.Header().Set("Content-Type", "application/json")
 		fmt.Fprintf(w, string(postsJson))
+	})
+
+	// get single post
+	router.GET("/posts/:id", func (w http.ResponseWriter, r *http.Request, p httprouter.Params) {
+		idParam := p.ByName("id")
+		var post Post
+
+		db.First(&post, idParam)
+
+		postJson, err := json.Marshal(post)
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		w.Header().Set("Content-Type", "application/json")
+		fmt.Fprintf(w, string(postJson))
 	})
 
 	router.POST("/posts", func (w http.ResponseWriter, r *http.Request, _ httprouter.Params) {

@@ -2,7 +2,6 @@ package main
 
 import (
 	"net/http"
-	"fmt"
 	"log"
 	"encoding/json"
 	"io/ioutil"
@@ -29,7 +28,7 @@ func main() {
 	router := httprouter.New()
 
 	router.GET("/", func (w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
-		fmt.Fprintf(w, "hello gratuscms")
+		w.Write([]byte("hello gratuscms"))
 	})
 
 	// get all posts
@@ -43,7 +42,7 @@ func main() {
 		}
 
 		w.Header().Set("Content-Type", "application/json")
-		fmt.Fprintf(w, string(postsJson))
+		w.Write([]byte(postsJson))
 	})
 
 	// get single post
@@ -59,7 +58,7 @@ func main() {
 		}
 
 		w.Header().Set("Content-Type", "application/json")
-		fmt.Fprintf(w, string(postJson))
+		w.Write([]byte(postJson))
 	})
 
 	router.POST("/posts", func (w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
@@ -68,7 +67,7 @@ func main() {
 		if err != nil {
 			log.Fatal(err)
 			return
-		}
+	}
 
 		var postData Post
 		json.Unmarshal(body, &postData)

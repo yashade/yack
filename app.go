@@ -111,6 +111,9 @@ func main() {
 				w.WriteHeader(400)
 				w.Write([]byte("Bad request"))
 			}
+		} else {
+			w.WriteHeader(400)
+			w.Write([]byte("Bad request"))
 		}
 	})
 

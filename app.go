@@ -30,8 +30,16 @@ func main() {
 
 	// get all posts
 	router.GET("/posts", func (w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+		offset := r.URL.Query().Get("offset")
+		limit := r.URL.Query().Get("limit")
+
 		var posts []Post
-		db.Find(&posts)
+		db.LogMode(true)
+		if offset != "" && limit != "" {
+			db.Debug().Limit(limit).Offset(offset).Find(&posts)
+		} else {
+			db.Find(&posts) // get all posts. ALL OF THEM!
+		}
 
 		postsJson, err := json.Marshal(posts)
 		check(err)

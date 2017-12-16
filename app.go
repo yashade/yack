@@ -2,7 +2,6 @@ package main
 
 import (
 	"net/http"
-	"log"
 	"encoding/json"
 	"io/ioutil"
 	"github.com/julienschmidt/httprouter"
@@ -18,9 +17,7 @@ type Post struct {
 
 func main() {
 	db, err := gorm.Open("sqlite3", "./db.sqlite3")
-	if err != nil {
-		log.Fatal(err)
-	}
+	check(err)
 	defer db.Close()
 
 	db.AutoMigrate(&Post{})
@@ -37,9 +34,7 @@ func main() {
 		db.Find(&posts)
 
 		postsJson, err := json.Marshal(posts)
-		if err != nil {
-			log.Fatal(err)
-		}
+		check(err)
 
 		w.Header().Set("Content-Type", "application/json")
 		w.Write([]byte(postsJson))
@@ -53,9 +48,7 @@ func main() {
 		db.First(&post, idParam)
 
 		postJson, err := json.Marshal(post)
-		if err != nil {
-			log.Fatal(err)
-		}
+		check(err)
 
 		w.Header().Set("Content-Type", "application/json")
 		w.Write([]byte(postJson))
@@ -64,10 +57,7 @@ func main() {
 	router.POST("/posts", func (w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 		body, err := ioutil.ReadAll(r.Body)
 		defer r.Body.Close()
-		if err != nil {
-			log.Fatal(err)
-			return
-	}
+		check(err)
 
 		var postData Post
 		json.Unmarshal(body, &postData)

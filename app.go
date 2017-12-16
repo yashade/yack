@@ -28,7 +28,7 @@ func main() {
 	router := httprouter.New()
 
 	router.GET("/", func (w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
-		w.Write([]byte("hello gratuscms"))
+		w.Write([]byte("hello yack"))
 	})
 
 	// get all posts

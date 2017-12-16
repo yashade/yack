@@ -11,9 +11,9 @@ import (
 )
 
 type Post struct {
-	Id int `json: "id"`
-	Title string `json: "title"`
-	Content string `json: "content"`
+	Id int `json:"id"`
+	Title string `json:"title"`
+	Content string `json:"content"`
 }
 
 func main() {

@@ -49,10 +49,10 @@ func main() {
 
 	// get single post
 	router.GET("/posts/:id", func (w http.ResponseWriter, r *http.Request, p httprouter.Params) {
-		idParam := p.ByName("id")
+		id := p.ByName("id")
 		var post Post
 
-		db.First(&post, idParam)
+		db.First(&post, id)
 
 		postJson, err := json.Marshal(post)
 		check(err)
@@ -86,6 +86,34 @@ func main() {
 			w.Write([]byte("Bad request"))
 		}
 	})
+
+	router.PUT("/posts/:id", func (w http.ResponseWriter, r *http.Request, p httprouter.Params) {
+		body, err := ioutil.ReadAll(r.Body)
+		defer r.Body.Close()
+		check(err)
+
+		id := p.ByName("id")
+		var post Post
+
+		db.First(&post, id)
+
+		// not a good solution but i don't wanna unmarshal the key to a struct
+		var dataTmp map[string]string
+		if isJSON(string(body)) {
+			err := json.Unmarshal(body, &dataTmp)
+			check(err)
+
+			if dataTmp["title"] != "" && dataTmp["content"] != "" {
+				post.Title = dataTmp["title"]
+				post.Content = dataTmp["content"]
+				db.Save(&post)
+			} else {
+				w.WriteHeader(400)
+				w.Write([]byte("Bad request"))
+			}
+		}
+	})
+
 
 	http.ListenAndServe(":2001", router)
 }

@@ -34,9 +34,8 @@ func main() {
 		limit := r.URL.Query().Get("limit")
 
 		var posts []Post
-		db.LogMode(true)
 		if offset != "" && limit != "" {
-			db.Debug().Limit(limit).Offset(offset).Find(&posts)
+			db.Limit(limit).Offset(offset).Find(&posts)
 		} else {
 			db.Find(&posts) // get all posts. ALL OF THEM!
 		}

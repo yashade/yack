@@ -59,11 +59,25 @@ func main() {
 		defer r.Body.Close()
 		check(err)
 
-		var postData Post
-		json.Unmarshal(body, &postData)
+		// not a good solution but i don't wanna unmarshal the key to a struct
+		var dataTmp map[string]interface{}
+		if isJSON(string(body)) {
+			err2 := json.Unmarshal(body, &dataTmp)
+			check(err2)
 
-		post := Post{Title: postData.Title, Content: postData.Content}
-		db.Create(&post)
+			if dataTmp["key"] == readFile("key") {
+				var postData Post
+				json.Unmarshal(body, &postData)
+				post := Post{Title: postData.Title, Content: postData.Content}
+				db.Create(&post)
+			} else {
+				w.WriteHeader(401)
+				w.Write([]byte("Unauthorized"))
+			}
+		} else {
+			w.WriteHeader(400)
+			w.Write([]byte("Bad request"))
+		}
 	})
 
 	http.Handle("/static/",

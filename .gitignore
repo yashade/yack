@@ -1,1 +1,4 @@
 *.sqlite3
+*.exe
+*.bat
+key

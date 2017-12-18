@@ -1,7 +1,8 @@
 **_**Yack is a damn simple headless CMS written in Go._****
 
 
-LICENSE
+**LICENSE**
+
 
 yack Copyright (C) 2017 Yashar Ahmedizade yashade2001@gmail.com
 

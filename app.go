@@ -72,14 +72,21 @@ func main() {
 			err2 := json.Unmarshal(body, &dataTmp)
 			check(err2)
 
-			if dataTmp["key"] == readFile("key") {
-				var postData Post
-				json.Unmarshal(body, &postData)
-				post := Post{Title: postData.Title, Content: postData.Content}
-				db.Create(&post)
+			key := readFile(readFile("yack-keyfile-path.conf")) // NOTE: it should not contain a newline character
+
+			if key != "" { // readFile() returns "" if the file is empty or does not exist
+				if dataTmp["key"] == key {
+					var postData Post
+					json.Unmarshal(body, &postData)
+					post := Post{Title: postData.Title, Content: postData.Content}
+					db.Create(&post)
+				} else {
+					w.WriteHeader(401)
+					w.Write([]byte("Unauthorized"))
+				}
 			} else {
-				w.WriteHeader(401)
-				w.Write([]byte("Unauthorized"))
+				w.WriteHeader(500)
+				w.Write([]byte("Internal server error (yack-keyfile-path.conf is not configured correctly!)"))
 			}
 		} else {
 			w.WriteHeader(400)

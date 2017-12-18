@@ -61,6 +61,21 @@ func main() {
 		w.Write([]byte(postJson))
 	})
 
+	// search
+	router.GET("/search", func (w http.ResponseWriter, r *http.Request, p httprouter.Params) {
+		query := r.URL.Query().Get("query")
+		var filteredPosts []Post
+		db.Where("title like ? or content like ?",
+			"%" + query + "%",
+				"%" + query + "%").Find(&filteredPosts)
+
+		filteredPostsJson, err := json.Marshal(filteredPosts)
+		check(err)
+
+		w.Header().Set("Content-Type", "application/json")
+		w.Write([]byte(filteredPostsJson))
+	})
+
 	router.POST("/posts", func (w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 		body, err := ioutil.ReadAll(r.Body)
 		defer r.Body.Close()

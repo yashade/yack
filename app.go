@@ -118,13 +118,18 @@ func main() {
 			err := json.Unmarshal(body, &dataTmp)
 			check(err)
 
-			if dataTmp["title"] != "" && dataTmp["content"] != "" {
-				post.Title = dataTmp["title"]
-				post.Content = dataTmp["content"]
-				db.Save(&post)
+			if dataTmp["key"] == readFile("key") {
+				if dataTmp["title"] != "" && dataTmp["content"] != "" {
+					post.Title = dataTmp["title"]
+					post.Content = dataTmp["content"]
+					db.Save(&post)
+				} else {
+					w.WriteHeader(400)
+					w.Write([]byte("Bad request"))
+				}
 			} else {
-				w.WriteHeader(400)
-				w.Write([]byte("Bad request"))
+				w.WriteHeader(401)
+				w.Write([]byte("Unauthorized"))
 			}
 		} else {
 			w.WriteHeader(400)

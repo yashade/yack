@@ -62,7 +62,7 @@ func main() {
 	})
 
 	// search
-	router.GET("/search", func (w http.ResponseWriter, r *http.Request, p httprouter.Params) {
+	router.GET("/search", func (w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 		query := r.URL.Query().Get("query")
 		var filteredPosts []Post
 

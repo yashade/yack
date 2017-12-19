@@ -71,11 +71,11 @@ func main() {
 				"%"+query+"%",
 				"%"+query+"%").Find(&filteredPosts)
 
-				filteredPostsJson, err := json.Marshal(filteredPosts)
-				check(err)
+			filteredPostsJson, err := json.Marshal(filteredPosts)
+			check(err)
 
-				w.Header().Set("Content-Type", "application/json")
-				w.Write([]byte(filteredPostsJson))
+			w.Header().Set("Content-Type", "application/json")
+			w.Write([]byte(filteredPostsJson))
 		} else  {
 			w.WriteHeader(400)
 			w.Write([]byte("Bad request (missing parameters)"))

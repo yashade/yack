@@ -65,15 +65,21 @@ func main() {
 	router.GET("/search", func (w http.ResponseWriter, r *http.Request, p httprouter.Params) {
 		query := r.URL.Query().Get("query")
 		var filteredPosts []Post
-		db.Where("title like ? or content like ?",
-			"%" + query + "%",
-				"%" + query + "%").Find(&filteredPosts)
 
-		filteredPostsJson, err := json.Marshal(filteredPosts)
-		check(err)
+		if query != "" {
+			db.Where("title like ? or content like ?",
+				"%"+query+"%",
+				"%"+query+"%").Find(&filteredPosts)
 
-		w.Header().Set("Content-Type", "application/json")
-		w.Write([]byte(filteredPostsJson))
+				filteredPostsJson, err := json.Marshal(filteredPosts)
+				check(err)
+
+				w.Header().Set("Content-Type", "application/json")
+				w.Write([]byte(filteredPostsJson))
+		} else  {
+			w.WriteHeader(400)
+			w.Write([]byte("Bad request (missing parameters)"))
+		}
 	})
 
 	router.POST("/posts", func (w http.ResponseWriter, r *http.Request, _ httprouter.Params) {

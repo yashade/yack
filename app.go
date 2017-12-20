@@ -7,6 +7,8 @@ import (
 	"github.com/julienschmidt/httprouter"
 	"github.com/jinzhu/gorm"
     _ "github.com/jinzhu/gorm/dialects/sqlite"
+	"flag"
+	"net/http/fcgi"
 )
 
 type Post struct {
@@ -15,7 +17,12 @@ type Post struct {
 	Content string `json:"content"`
 }
 
+var fastcgi = flag.Bool("fcgi", false, "run as fcgi")
+var port = flag.String("port", "2001", "specify a port")
+
 func main() {
+	flag.Parse()
+
 	db, err := gorm.Open("sqlite3", "./db.sqlite3")
 	check(err)
 	defer db.Close()
@@ -143,6 +150,13 @@ func main() {
 		}
 	})
 
+	var errServe error
 
-	http.ListenAndServe(":2001", router)
+	if *fastcgi {
+		errServe = fcgi.Serve(nil, router)
+	} else {
+		errServe = http.ListenAndServe(":" + *port, router)
+	}
+
+	check(errServe)
 }

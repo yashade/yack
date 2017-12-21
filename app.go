@@ -29,7 +29,6 @@ func main() {
 	log.SetOutput(io.MultiWriter(os.Stdout, f))
 	check(err)
 	defer f.Close()
-	log.Println("YACK") // for testing
 
 	flag.Parse()
 

@@ -9,6 +9,8 @@ import (
     _ "github.com/jinzhu/gorm/dialects/sqlite"
 	"flag"
 	"net/http/fcgi"
+	"os"
+	"log"
 )
 
 type Post struct {
@@ -21,6 +23,14 @@ var fastcgi = flag.Bool("fcgi", false, "run as fcgi")
 var port = flag.String("port", "2001", "specify a port")
 
 func main() {
+	// write logs to stdout and a file
+	f, err := os.OpenFile("yack.log", os.O_RDWR | os.O_CREATE | os.O_APPEND, 0666)
+	log.SetOutput(f)
+	log.SetOutput(os.Stdout)
+	check(err)
+	defer f.Close()
+	log.Println("YACK") // for testing
+
 	flag.Parse()
 
 	db, err := gorm.Open("sqlite3", "./db.sqlite3")

@@ -11,6 +11,7 @@ import (
 	"net/http/fcgi"
 	"os"
 	"log"
+	"io"
 )
 
 type Post struct {
@@ -25,8 +26,7 @@ var port = flag.String("port", "2001", "specify a port")
 func main() {
 	// write logs to stdout and a file
 	f, err := os.OpenFile("yack.log", os.O_RDWR | os.O_CREATE | os.O_APPEND, 0666)
-	log.SetOutput(f)
-	log.SetOutput(os.Stdout)
+	log.SetOutput(io.MultiWriter(os.Stdout, f))
 	check(err)
 	defer f.Close()
 	log.Println("YACK") // for testing

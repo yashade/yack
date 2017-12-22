@@ -36,7 +36,8 @@ func main() {
 	check(err)
 	defer db.Close()
 
-	db.AutoMigrate(&Post{})
+	errDb := db.AutoMigrate(&Post{}).Error
+	check(errDb)
 
 	router := httprouter.New()
 
@@ -51,9 +52,11 @@ func main() {
 
 		var posts []Post
 		if offset != "" && limit != "" {
-			db.Limit(limit).Offset(offset).Find(&posts)
+			errDb := db.Limit(limit).Offset(offset).Find(&posts).Error
+			check(errDb)
 		} else {
-			db.Find(&posts) // get all posts. ALL OF THEM!
+			errDb := db.Find(&posts).Error // get all posts. ALL OF THEM!
+			check(errDb)
 		}
 
 		postsJson, err := json.Marshal(posts)
@@ -68,7 +71,8 @@ func main() {
 		id := p.ByName("id")
 		var post Post
 
-		db.First(&post, id)
+		errDb := db.First(&post, id).Error
+		check(errDb)
 
 		postJson, err := json.Marshal(post)
 		check(err)
@@ -83,9 +87,10 @@ func main() {
 		var filteredPosts []Post
 
 		if query != "" {
-			db.Where("title like ? or content like ?",
+			errDb := db.Where("title like ? or content like ?",
 				"%"+query+"%",
-				"%"+query+"%").Find(&filteredPosts)
+				"%"+query+"%").Find(&filteredPosts).Error
+			check(errDb)
 
 			filteredPostsJson, err := json.Marshal(filteredPosts)
 			check(err)
@@ -113,7 +118,8 @@ func main() {
 				var postData Post
 				json.Unmarshal(body, &postData)
 				post := Post{Title: postData.Title, Content: postData.Content}
-				db.Create(&post)
+				errDb := db.Create(&post).Error
+				check(errDb)
 			} else {
 				w.WriteHeader(401)
 				w.Write([]byte("Unauthorized"))
@@ -132,7 +138,8 @@ func main() {
 		id := p.ByName("id")
 		var post Post
 
-		db.First(&post, id)
+		errDb := db.First(&post, id).Error
+		check(errDb)
 
 		// not a good solution but i don't wanna unmarshal the key to a struct
 		var dataTmp map[string]string
@@ -144,7 +151,8 @@ func main() {
 				if dataTmp["title"] != "" && dataTmp["content"] != "" {
 					post.Title = dataTmp["title"]
 					post.Content = dataTmp["content"]
-					db.Save(&post)
+					errDb := db.Save(&post).Error
+					check(errDb)
 				} else {
 					w.WriteHeader(400)
 					w.Write([]byte("Bad request"))
